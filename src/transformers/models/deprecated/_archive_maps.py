@@ -1576,6 +1576,12 @@ OWLVIT_PRETRAINED_MODEL_ARCHIVE_LIST = DeprecatedList(
     ["google/owlvit-base-patch32", "google/owlvit-base-patch16", "google/owlvit-large-patch14"]
 )
 
+PARLERTTS_PRETRAINED_CONFIG_ARCHIVE_MAP = DeprecatedDict(
+    {"facebook/musicgen-small": "https://huggingface.co/parler-tts/parler_tts_mini_v0.1/resolve/main/config.json"}
+)
+
+PARLERTTS_PRETRAINED_MODEL_ARCHIVE_LIST = DeprecatedList(["parler-tts/parler_tts_mini_v0.1"])
+
 PATCHTSMIXER_PRETRAINED_CONFIG_ARCHIVE_MAP = DeprecatedDict(
     {
         "ibm/patchtsmixer-etth1-pretrain": "https://huggingface.co/ibm/patchtsmixer-etth1-pretrain/resolve/main/config.json"
