@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" MusicGen model configuration"""
+""" ParlerTTS model configuration"""
 
 from ...configuration_utils import PretrainedConfig
 from ...utils import logging
@@ -207,10 +207,11 @@ class ParlerTTSConfig(PretrainedConfig):
 
         decoder_config = kwargs.pop("decoder")
 
+        self.vocab_size = vocab_size
         self.text_encoder = AutoConfig.for_model(text_encoder_model_type, **text_encoder_config)
         self.audio_encoder = AutoConfig.for_model(audio_encoder_model_type, **audio_encoder_config)
         self.decoder = ParlerTTSDecoderConfig(**decoder_config)
-        self.is_encoder_decoder = False
+        self.is_encoder_decoder = True
 
     @classmethod
     def from_sub_models_config(
