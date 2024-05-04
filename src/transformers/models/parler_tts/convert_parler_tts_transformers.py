@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Dict, OrderedDict, Tuple
 
 import torch
-from audiocraft.models import MusicGen
+#from audiocraft.models import MusicGen
 
 from transformers import (
     AutoFeatureExtractor,
@@ -87,33 +87,21 @@ def rename_state_dict(state_dict: OrderedDict, hidden_size: int) -> Tuple[Dict, 
     return state_dict, enc_dec_proj_state_dict
 
 
-def decoder_config_from_checkpoint(checkpoint: str) -> MusicgenDecoderConfig:
-    if checkpoint == "small" or checkpoint == "facebook/musicgen-stereo-small":
+def decoder_config_from_checkpoint(checkpoint: str) -> ParlerTTSDecoderConfig:
+    if checkpoint == "small" or checkpoint == "parler-tts/parler_tts_mini_v0.1":
         # default config values
         hidden_size = 1024
         num_hidden_layers = 24
         num_attention_heads = 16
-    elif checkpoint == "medium" or checkpoint == "facebook/musicgen-stereo-medium":
-        hidden_size = 1536
-        num_hidden_layers = 48
-        num_attention_heads = 24
-    elif checkpoint == "large" or checkpoint == "facebook/musicgen-stereo-large":
-        hidden_size = 2048
-        num_hidden_layers = 48
-        num_attention_heads = 32
     else:
         raise ValueError(
-            "Checkpoint should be one of `['small', 'medium', 'large']` for the mono checkpoints, "
-            "or `['facebook/musicgen-stereo-small', 'facebook/musicgen-stereo-medium', 'facebook/musicgen-stereo-large']` "
-            f"for the stereo checkpoints, got {checkpoint}."
+            "Checkpoint should be one of `['small',]` for the mono checkpoints, "
+            "or `['parler-tts/parler_tts_mini_v0.1']` "
+            f", got {checkpoint}."
         )
-
-    if "stereo" in checkpoint:
-        audio_channels = 2
-        num_codebooks = 8
-    else:
+    
         audio_channels = 1
-        num_codebooks = 4
+        num_codebooks = 9
 
     config = ParlerTTSDecoderConfig(
         hidden_size=hidden_size,
@@ -130,17 +118,18 @@ def decoder_config_from_checkpoint(checkpoint: str) -> MusicgenDecoderConfig:
 def convert_parler_tts_checkpoint(
     checkpoint, pytorch_dump_folder=None, repo_id=None, device="cpu", safe_serialization=False
 ):
-    fairseq_model = MusicGen.get_pretrained(checkpoint, device=device)
+    #fairseq_model = MusicGen.get_pretrained(checkpoint, device=device)
     decoder_config = decoder_config_from_checkpoint(checkpoint)
-
-    decoder_state_dict = fairseq_model.lm.state_dict()
+    decoder = ParlerTTSForCausalLM(decoder_config)
+    decoder_state_dict = decoder.state_dict()
     decoder_state_dict, enc_dec_proj_state_dict = rename_state_dict(
         decoder_state_dict, hidden_size=decoder_config.hidden_size
     )
 
     text_encoder = T5EncoderModel.from_pretrained("google-t5/t5-base")
     audio_encoder = EncodecModel.from_pretrained("facebook/encodec_32khz")
-    decoder = ParlerTTSForCausalLM(decoder_config).eval()
+    #decoder = ParlerTTSForCausalLM(decoder_config).eval()
+    decoder.eval()
 
     # load all decoder weights - expect that we'll be missing embeddings and enc-dec projection
     missing_keys, unexpected_keys = decoder.load_state_dict(decoder_state_dict, strict=False)
@@ -232,4 +221,4 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    convert_musicgen_checkpoint(args.checkpoint, args.pytorch_dump_folder, args.push_to_hub)
+    convert_parler_tts_checkpoint(args.checkpoint, args.pytorch_dump_folder, args.push_to_hub)

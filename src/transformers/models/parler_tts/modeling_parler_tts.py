@@ -53,7 +53,7 @@ from ...utils import (
 )
 from ..auto.configuration_auto import AutoConfig
 from ..auto.modeling_auto import AutoModel
-from .configuration_musicgen import MusicgenConfig, MusicgenDecoderConfig
+from .configuration_parler_tts import ParlerTTSConfig, ParlerTTSDecoderConfig
 
 
 if is_flash_attn_2_available():
@@ -181,7 +181,7 @@ class ParlerTTSAttention(nn.Module):
         is_decoder: bool = False,
         bias: bool = True,
         is_causal: bool = False,
-        config: Optional[MusicgenConfig] = None,
+        config: Optional[ParlerTTSConfig] = None,
     ):
         super().__init__()
         self.embed_dim = embed_dim
@@ -329,7 +329,7 @@ class ParlerTTSAttention(nn.Module):
 
 
 # Copied from transformers.models.bart.modeling_bart.BartFlashAttention2 with Bart->Musicgen
-class MusicgenFlashAttention2(MusicgenAttention):
+class ParlerTTSFlashAttention2(ParlerTTSAttention):
     """
     Musicgen flash attention module. This module inherits from `MusicgenAttention` as the weights of the module stays
     untouched. The only required change would be on the forward pass where it needs to correctly call the public API of
@@ -357,9 +357,9 @@ class MusicgenFlashAttention2(MusicgenAttention):
         layer_head_mask: Optional[torch.Tensor] = None,
         output_attentions: bool = False,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
-        # MusicgenFlashAttention2 attention does not support output_attentions
+        # ParlerTTSFlashAttention2 attention does not support output_attentions
         if output_attentions:
-            raise ValueError("MusicgenFlashAttention2 attention does not support output_attentions")
+            raise ValueError("ParlerTTSFlashAttention2 attention does not support output_attentions")
 
         # if key_value_states are provided this layer is used as a cross-attention layer
         # for the decoder
@@ -548,7 +548,7 @@ class MusicgenFlashAttention2(MusicgenAttention):
 
 
 # Copied from transformers.models.bart.modeling_bart.BartSdpaAttention with Bart->Musicgen
-class MusicgenSdpaAttention(MusicgenAttention):
+class ParlerTTSSdpaAttention(ParlerTTSAttention):
     def forward(
         self,
         hidden_states: torch.Tensor,
@@ -562,7 +562,7 @@ class MusicgenSdpaAttention(MusicgenAttention):
         if output_attentions or layer_head_mask is not None:
             # TODO: Improve this warning with e.g. `model.config._attn_implementation = "manual"` once this is implemented.
             logger.warning_once(
-                "MusicgenModel is using MusicgenSdpaAttention, but `torch.nn.functional.scaled_dot_product_attention` does not support `output_attentions=True` or `layer_head_mask` not None. Falling back to the manual attention"
+                "ParlerTTSModel is using ParlerTTSSdpaAttention, but `torch.nn.functional.scaled_dot_product_attention` does not support `output_attentions=True` or `layer_head_mask` not None. Falling back to the manual attention"
                 ' implementation, but specifying the manual implementation will be required from Transformers version v5.0.0 onwards. This warning can be removed using the argument `attn_implementation="eager"` when loading the model.'
             )
             return super().forward(
@@ -650,19 +650,19 @@ class MusicgenSdpaAttention(MusicgenAttention):
         return attn_output, None, past_key_value
 
 
-MUSICGEN_ATTENTION_CLASSES = {
-    "eager": MusicgenAttention,
-    "sdpa": MusicgenSdpaAttention,
-    "flash_attention_2": MusicgenFlashAttention2,
+PARLERTTS_ATTENTION_CLASSES = {
+    "eager": ParlerTTSAttention,
+    "sdpa": ParlerTTSSdpaAttention,
+    "flash_attention_2": ParlerTTSFlashAttention2,
 }
 
 
-class MusicgenDecoderLayer(nn.Module):
-    def __init__(self, config: MusicgenDecoderConfig):
+class ParlerTTSDecoderLayer(nn.Module):
+    def __init__(self, config: ParlerTTSDecoderConfig):
         super().__init__()
         self.embed_dim = config.hidden_size
 
-        self.self_attn = MUSICGEN_ATTENTION_CLASSES[config._attn_implementation](
+        self.self_attn = PARLERTTS_ATTENTION_CLASSES[config._attn_implementation](
             embed_dim=self.embed_dim,
             num_heads=config.num_attention_heads,
             dropout=config.attention_dropout,
@@ -676,7 +676,7 @@ class MusicgenDecoderLayer(nn.Module):
         self.activation_dropout = config.activation_dropout
 
         self.self_attn_layer_norm = nn.LayerNorm(self.embed_dim)
-        self.encoder_attn = MUSICGEN_ATTENTION_CLASSES[config._attn_implementation](
+        self.encoder_attn = PARLERTTS_ATTENTION_CLASSES[config._attn_implementation](
             self.embed_dim,
             config.num_attention_heads,
             dropout=config.attention_dropout,
@@ -780,16 +780,16 @@ class MusicgenDecoderLayer(nn.Module):
         return outputs
 
 
-class MusicgenPreTrainedModel(PreTrainedModel):
+class ParlerTTSPreTrainedModel(PreTrainedModel):
     """
     An abstract class to handle weights initialization and a simple interface for downloading and loading pretrained
     models.
     """
 
-    config_class = MusicgenDecoderConfig
+    config_class = ParlerTTSDecoderConfig
     base_model_prefix = "model"
     supports_gradient_checkpointing = True
-    _no_split_modules = ["MusicgenDecoderLayer", "MusicgenAttention"]
+    _no_split_modules = ["ParlerTTSDecoderLayer", "ParlerTTSAttention"]
     _supports_flash_attn_2 = True
     _supports_sdpa = True
 
@@ -805,7 +805,7 @@ class MusicgenPreTrainedModel(PreTrainedModel):
                 module.weight.data[module.padding_idx].zero_()
 
 
-MUSICGEN_START_DOCSTRING = r"""
+PARLERTTS_START_DOCSTRING = r"""
 
     The Musicgen model was proposed in [Simple and Controllable Music Generation](https://arxiv.org/abs/2306.05284) by
     Jade Copet, Felix Kreuk, Itai Gat, Tal Remez, David Kant, Gabriel Synnaeve, Yossi Adi, Alexandre Défossez. It is an
@@ -825,7 +825,7 @@ MUSICGEN_START_DOCSTRING = r"""
             configuration. Check out the [`~PreTrainedModel.from_pretrained`] method to load the model weights.
 """
 
-MUSICGEN_INPUTS_DOCSTRING = r"""
+PARLERTTS_INPUTS_DOCSTRING = r"""
     Args:
         input_ids (`torch.LongTensor` of shape `(batch_size, sequence_length)`):
             Indices of input sequence tokens in the vocabulary. Padding will be ignored by default should you provide
@@ -927,7 +927,7 @@ MUSICGEN_INPUTS_DOCSTRING = r"""
             Whether or not to return a [`~utils.ModelOutput`] instead of a plain tuple.
 """
 
-MUSICGEN_DECODER_INPUTS_DOCSTRING = r"""
+PARLERTTS_DECODER_INPUTS_DOCSTRING = r"""
     Args:
         input_ids (`torch.LongTensor` of shape `(batch_size * num_codebooks, sequence_length)`):
             Indices of input sequence tokens in the vocabulary, corresponding to the sequence of audio codes.
@@ -1005,12 +1005,12 @@ MUSICGEN_DECODER_INPUTS_DOCSTRING = r"""
 """
 
 
-class MusicgenDecoder(MusicgenPreTrainedModel):
+class ParlerTTSDecoder(ParlerTTSPreTrainedModel):
     """
     Transformer decoder consisting of *config.num_hidden_layers* layers. Each layer is a [`MusicgenDecoderLayer`]
     """
 
-    def __init__(self, config: MusicgenDecoderConfig):
+    def __init__(self, config: ParlerTTSDecoderConfig):
         super().__init__(config)
         self.dropout = config.dropout
         self.layerdrop = config.layerdrop
@@ -1024,12 +1024,12 @@ class MusicgenDecoder(MusicgenPreTrainedModel):
             [nn.Embedding(embed_dim, config.hidden_size) for _ in range(config.num_codebooks)]
         )
 
-        self.embed_positions = MusicgenSinusoidalPositionalEmbedding(
+        self.embed_positions = ParlerTTSSinusoidalPositionalEmbedding(
             config.max_position_embeddings,
             config.hidden_size,
         )
 
-        self.layers = nn.ModuleList([MusicgenDecoderLayer(config) for _ in range(config.num_hidden_layers)])
+        self.layers = nn.ModuleList([ParlerTTSDecoderLayer(config) for _ in range(config.num_hidden_layers)])
         self.layer_norm = nn.LayerNorm(config.hidden_size)
         self.attn_implementation = config._attn_implementation
 
@@ -1043,7 +1043,7 @@ class MusicgenDecoder(MusicgenPreTrainedModel):
     def set_input_embeddings(self, value):
         self.embed_tokens = value
 
-    @add_start_docstrings_to_model_forward(MUSICGEN_DECODER_INPUTS_DOCSTRING)
+    @add_start_docstrings_to_model_forward(PARLERTTS_DECODER_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids: torch.LongTensor = None,
@@ -1220,13 +1220,13 @@ class MusicgenDecoder(MusicgenPreTrainedModel):
 
 
 @add_start_docstrings(
-    "The bare Musicgen decoder model outputting raw hidden-states without any specific head on top.",
-    MUSICGEN_START_DOCSTRING,
+    "The bare ParlerTTS decoder model outputting raw hidden-states without any specific head on top.",
+    PARLERTTS_START_DOCSTRING,
 )
-class MusicgenModel(MusicgenPreTrainedModel):
-    def __init__(self, config: MusicgenDecoderConfig):
+class ParlerTTSModel(ParlerTTSPreTrainedModel):
+    def __init__(self, config: ParlerTTSDecoderConfig):
         super().__init__(config)
-        self.decoder = MusicgenDecoder(config)
+        self.decoder = ParlerTTSDecoder(config)
         # Initialize weights and apply final processing
         self.post_init()
 
@@ -1239,7 +1239,7 @@ class MusicgenModel(MusicgenPreTrainedModel):
     def get_decoder(self):
         return self.decoder
 
-    @add_start_docstrings_to_model_forward(MUSICGEN_DECODER_INPUTS_DOCSTRING)
+    @add_start_docstrings_to_model_forward(PARLERTTS_DECODER_INPUTS_DOCSTRING)
     def forward(
         self,
         input_ids: torch.LongTensor = None,
@@ -1291,14 +1291,14 @@ class MusicgenModel(MusicgenPreTrainedModel):
 
 
 @add_start_docstrings(
-    "The MusicGen decoder model with a language modelling head on top.",
-    MUSICGEN_START_DOCSTRING,
+    "The ParlerTTS decoder model with a language modelling head on top.",
+    PARLERTTS_START_DOCSTRING,
 )
-class MusicgenForCausalLM(MusicgenPreTrainedModel):
-    def __init__(self, config: MusicgenDecoderConfig):
+class ParlerTTSForCausalLM(ParlerTTSPreTrainedModel):
+    def __init__(self, config: ParlerTTSDecoderConfig):
         super().__init__(config)
 
-        self.model = MusicgenModel(config)
+        self.model = ParlerTTSModel(config)
 
         self.num_codebooks = config.num_codebooks
         self.lm_heads = nn.ModuleList(
@@ -1326,7 +1326,7 @@ class MusicgenForCausalLM(MusicgenPreTrainedModel):
     def get_decoder(self):
         return self.model.decoder
 
-    @add_start_docstrings_to_model_forward(MUSICGEN_DECODER_INPUTS_DOCSTRING)
+    @add_start_docstrings_to_model_forward(PARLERTTS_DECODER_INPUTS_DOCSTRING)
     @replace_return_docstrings(output_type=Seq2SeqLMOutput, config_class=_CONFIG_FOR_DOC)
     def forward(
         self,
@@ -1810,12 +1810,12 @@ class MusicgenForCausalLM(MusicgenPreTrainedModel):
 
 
 @add_start_docstrings(
-    "The composite MusicGen model with a text encoder, audio encoder and Musicgen decoder, "
+    "The composite ParlerTTS model with a text encoder, audio encoder and ParlerTTS decoder, "
     "for music generation tasks with one or both of text and audio prompts.",
-    MUSICGEN_START_DOCSTRING,
+    PARLERTTS_START_DOCSTRING,
 )
-class MusicgenForConditionalGeneration(PreTrainedModel):
-    config_class = MusicgenConfig
+class ParlerTTSForConditionalGeneration(PreTrainedModel):
+    config_class = ParlerTTSConfig
     base_model_prefix = "encoder_decoder"
     main_input_name = "input_ids"
     supports_gradient_checkpointing = True
@@ -1824,17 +1824,17 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
 
     def __init__(
         self,
-        config: Optional[MusicgenConfig] = None,
+        config: Optional[ParlerTTSConfig] = None,
         text_encoder: Optional[PreTrainedModel] = None,
         audio_encoder: Optional[PreTrainedModel] = None,
-        decoder: Optional[MusicgenForCausalLM] = None,
+        decoder: Optional[ParlerTTSForCausalLM] = None,
     ):
         if config is None and (text_encoder is None or audio_encoder is None or decoder is None):
             raise ValueError(
-                "Either a configuration has to be provided, or all three of text encoder, audio encoder and MusicGen decoder."
+                "Either a configuration has to be provided, or all three of text encoder, audio encoder and ParlerTTS decoder."
             )
         if config is None:
-            config = MusicgenConfig.from_sub_models_config(text_encoder.config, audio_encoder.config, decoder.config)
+            config = ParlerTTSConfig.from_sub_models_config(text_encoder.config, audio_encoder.config, decoder.config)
         else:
             if not isinstance(config, self.config_class):
                 raise ValueError(f"Config: {config} has to be of type {self.config_class}")
@@ -1842,7 +1842,7 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
         if config.decoder.cross_attention_hidden_size is not None:
             if config.decoder.cross_attention_hidden_size != config.text_encoder.hidden_size:
                 raise ValueError(
-                    "If `cross_attention_hidden_size` is specified in the MusicGen decoder's configuration, it has to be equal"
+                    "If `cross_attention_hidden_size` is specified in the ParlerTTS decoder's configuration, it has to be equal"
                     f" to the text encoder's `hidden_size`. Got {config.decoder.cross_attention_hidden_size} for"
                     f" `config.decoder.cross_attention_hidden_size` and {config.text_encoder.hidden_size} for"
                     " `config.text_encoder.hidden_size`."
@@ -1862,7 +1862,7 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
             audio_encoder = AutoModel.from_config(config.audio_encoder)
 
         if decoder is None:
-            decoder = MusicgenForCausalLM(config.decoder)
+            decoder = ParlerTTSForCausalLM(config.decoder)
 
         self.text_encoder = text_encoder
         self.audio_encoder = audio_encoder
@@ -1956,15 +1956,15 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import MusicgenForConditionalGeneration
+        >>> from transformers import ParlerTTSForConditionalGeneration
 
-        >>> model = MusicgenForConditionalGeneration.from_pretrained("facebook/musicgen-small")
+        >>> model = ParlerTTSForConditionalGeneration.from_pretrained("parler-tts/parler_tts_mini_v0.1")
         ```"""
 
         # At the moment fast initialization is not supported for composite models
         if kwargs.get("_fast_init", False):
             logger.warning(
-                "Fast initialization is currently not supported for MusicgenForConditionalGeneration. "
+                "Fast initialization is currently not supported for ParlerTTSForConditionalGeneration. "
                 "Falling back to slow initialization..."
             )
         kwargs["_fast_init"] = False
@@ -1981,7 +1981,7 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
         **kwargs,
     ) -> PreTrainedModel:
         r"""
-        Instantiate a text encoder, an audio encoder, and a MusicGen decoder from one, two or three base classes of the
+        Instantiate a text encoder, an audio encoder, and a ParlerTTS decoder from one, two or three base classes of the
         library from pretrained model checkpoints.
 
 
@@ -2029,10 +2029,10 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
         Example:
 
         ```python
-        >>> from transformers import MusicgenForConditionalGeneration
+        >>> from transformers import ParlerTTSForConditionalGeneration
 
-        >>> # initialize a musicgen model from a t5 text encoder, encodec audio encoder, and musicgen decoder
-        >>> model = MusicgenForConditionalGeneration.from_sub_models_pretrained(
+        >>> # initialize a ParlerTTS model from a t5 text encoder, encodec audio encoder, and musicgen decoder
+        >>> model = ParlerTTSForConditionalGeneration.from_sub_models_pretrained(
         ...     text_encoder_pretrained_model_name_or_path="google-t5/t5-base",
         ...     audio_encoder_pretrained_model_name_or_path="facebook/encodec_24khz",
         ...     decoder_pretrained_model_name_or_path="facebook/musicgen-small",
@@ -2137,7 +2137,7 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
                     decoder_pretrained_model_name_or_path, **kwargs_decoder, return_unused_kwargs=True
                 )
 
-                if isinstance(decoder_config, MusicgenConfig):
+                if isinstance(decoder_config, ParlerTTSConfig):
                     decoder_config = decoder_config.decoder
 
                 if decoder_config.is_decoder is False or decoder_config.add_cross_attention is False:
@@ -2160,15 +2160,15 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
                     "`decoder_config` to `.from_sub_models_pretrained(...)`"
                 )
 
-            decoder = MusicgenForCausalLM.from_pretrained(decoder_pretrained_model_name_or_path, **kwargs_decoder)
+            decoder = ParlerTTSForCausalLM.from_pretrained(decoder_pretrained_model_name_or_path, **kwargs_decoder)
 
         # instantiate config with corresponding kwargs
-        config = MusicgenConfig.from_sub_models_config(
+        config = ParlerTTSConfig.from_sub_models_config(
             text_encoder.config, audio_encoder.config, decoder.config, **kwargs
         )
         return cls(text_encoder=text_encoder, audio_encoder=audio_encoder, decoder=decoder, config=config)
 
-    @add_start_docstrings_to_model_forward(MUSICGEN_INPUTS_DOCSTRING)
+    @add_start_docstrings_to_model_forward(PARLERTTS_INPUTS_DOCSTRING)
     @replace_return_docstrings(output_type=Seq2SeqLMOutput, config_class=_CONFIG_FOR_DOC)
     def forward(
         self,
@@ -2941,7 +2941,7 @@ class MusicgenForConditionalGeneration(PreTrainedModel):
 
         attention_mask = torch.zeros((num_samples, 1), device=self.device, dtype=torch.long)
 
-        return MusicgenUnconditionalInput(
+        return ParlerTTSUnconditionalInput(
             encoder_outputs=(last_hidden_state,),
             attention_mask=attention_mask,
             guidance_scale=1.0,

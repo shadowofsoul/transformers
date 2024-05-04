@@ -23,7 +23,7 @@ from ...processing_utils import ProcessorMixin
 from ...utils import to_numpy
 
 
-class MusicgenProcessor(ProcessorMixin):
+class ParlerTTSProcessor(ProcessorMixin):
     r"""
     Constructs a MusicGen processor which wraps an EnCodec feature extractor and a T5 tokenizer into a single processor
     class.
