@@ -320,6 +320,11 @@ _import_structure = {
         "CTRLTokenizer",
     ],
     "models.cvt": ["CVT_PRETRAINED_CONFIG_ARCHIVE_MAP", "CvtConfig"],
+    "models.dac": [
+        "DAC_PRETRAINED_CONFIG_ARCHIVE_MAP",
+        "DacConfig",
+        "DacFeatureExtractor",
+    ],
     "models.data2vec": [
         "DATA2VEC_TEXT_PRETRAINED_CONFIG_ARCHIVE_MAP",
         "DATA2VEC_VISION_PRETRAINED_CONFIG_ARCHIVE_MAP",
