@@ -206,8 +206,8 @@ class ParlerTTSConfig(PretrainedConfig):
         audio_encoder_model_type = audio_encoder_config.pop("model_type")
 
         decoder_config = kwargs.pop("decoder")
-
-        self.vocab_size = vocab_size
+        
+        self.vocab_size = decoder_config['vocab_size']
         self.text_encoder = AutoConfig.for_model(text_encoder_model_type, **text_encoder_config)
         self.audio_encoder = AutoConfig.for_model(audio_encoder_model_type, **audio_encoder_config)
         self.decoder = ParlerTTSDecoderConfig(**decoder_config)

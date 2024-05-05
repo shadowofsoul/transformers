@@ -13,16 +13,19 @@
 # limitations under the License.
 from typing import TYPE_CHECKING
 
-from ...utils import OptionalDependencyNotAvailable, _LazyModule, is_torch_available
+from ...utils import (
+    OptionalDependencyNotAvailable,
+    _LazyModule,
+    is_torch_available,
+)
 
 
 _import_structure = {
-    "configuration_parler_tts": [
-        "PARLERTTS_PRETRAINED_CONFIG_ARCHIVE_MAP",
-        "ParlerTTSConfig",
-        "ParlerTTSDecoderConfig",
+    "configuration_dac": [
+        "DAC_PRETRAINED_CONFIG_ARCHIVE_MAP",
+        "DacConfig",
     ],
-    "processing_parler_tts": ["ParlerTTSProcessor"],
+    "feature_extraction_dac": ["DacFeatureExtractor"],
 }
 
 try:
@@ -31,21 +34,18 @@ try:
 except OptionalDependencyNotAvailable:
     pass
 else:
-    _import_structure["modeling_parler_tts"] = [
-        "PARLERTTS_PRETRAINED_MODEL_ARCHIVE_LIST",
-        "ParlerTTSForConditionalGeneration",
-        "ParlerTTSForCausalLM",
-        "ParlerTTSModel",
-        "ParlerTTSPreTrainedModel",
+    _import_structure["modeling_dac"] = [
+        "DAC_PRETRAINED_MODEL_ARCHIVE_LIST",
+        "DacModel",
+        "DacPreTrainedModel",
     ]
 
 if TYPE_CHECKING:
-    from .configuration_musicgen import (
-        PARLERTTS_PRETRAINED_CONFIG_ARCHIVE_MAP,
-        ParlerTTSConfig,
-        ParlerTTSDecoderConfig,
+    from .configuration_dac import (
+        DAC_PRETRAINED_CONFIG_ARCHIVE_MAP,
+        DacConfig,
     )
-    from .processing_parler_tts import ParlerTTSProcessor
+    from .feature_extraction_dac import DacFeatureExtractor
 
     try:
         if not is_torch_available():
@@ -53,12 +53,10 @@ if TYPE_CHECKING:
     except OptionalDependencyNotAvailable:
         pass
     else:
-        from .modeling_parler_tts import (
-            PARLERTTS_PRETRAINED_MODEL_ARCHIVE_LIST,
-            ParlerTTSForCausalLM,
-            ParlerTTSForConditionalGeneration,
-            ParlerTTSModel,
-            ParlerTTSPreTrainedModel,
+        from .modeling_dac import (
+            DAC_PRETRAINED_MODEL_ARCHIVE_LIST,
+            DacModel,
+            DacPreTrainedModel,
         )
 
 else:

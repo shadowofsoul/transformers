@@ -299,7 +299,16 @@ _import_structure = {
         "CTRLConfig",
         "CTRLTokenizer",
     ],
+<<<<<<< HEAD
     "models.cvt": ["CvtConfig"],
+=======
+    "models.cvt": ["CVT_PRETRAINED_CONFIG_ARCHIVE_MAP", "CvtConfig"],
+    "models.dac": [
+        "DAC_PRETRAINED_CONFIG_ARCHIVE_MAP",
+        "DacConfig",
+        "DacFeatureExtractor",
+    ],
+>>>>>>> adding basic files for dac model based in encodec
     "models.data2vec": [
         "Data2VecAudioConfig",
         "Data2VecTextConfig",
