@@ -509,6 +509,14 @@ TF_CVT_PRETRAINED_MODEL_ARCHIVE_LIST = DeprecatedList(
     ]
 )
 
+DAC_PRETRAINED_CONFIG_ARCHIVE_MAP = DeprecatedDict(
+    {
+        "parler-tts/dac_44khZ_8kbps": "https://huggingface.co/parler-tts/dac_44khZ_8kbps/resolve/main/config.json",
+    }
+)
+
+DAC_PRETRAINED_MODEL_ARCHIVE_LIST = DeprecatedList(["parler-tts/dac_44khZ_8kbps"])
+
 DATA2VEC_TEXT_PRETRAINED_CONFIG_ARCHIVE_MAP = DeprecatedDict(
     {"facebook/data2vec-text-base": "https://huggingface.co/data2vec/resolve/main/config.json"}
 )
