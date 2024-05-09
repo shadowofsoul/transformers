@@ -300,6 +300,10 @@ _import_structure = {
         "CTRLTokenizer",
     ],
     "models.cvt": ["CvtConfig"],
+    "models.dac": [
+        "DacConfig",
+        "DacFeatureExtractor",
+    ],
     "models.data2vec": [
         "Data2VecAudioConfig",
         "Data2VecTextConfig",
@@ -575,6 +579,10 @@ _import_structure = {
         "OwlViTProcessor",
         "OwlViTTextConfig",
         "OwlViTVisionConfig",
+    ],
+    "models.parler_tts": [
+        "ParlerTTSConfig",
+        "ParlerTTSDecoderConfig",
     ],
     "models.patchtsmixer": ["PatchTSMixerConfig"],
     "models.patchtst": ["PatchTSTConfig"],
