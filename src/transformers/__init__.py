@@ -308,7 +308,10 @@ _import_structure = {
         "DacConfig",
         "DacFeatureExtractor",
     ],
+<<<<<<< HEAD
 >>>>>>> adding basic files for dac model based in encodec
+=======
+>>>>>>> e76b3f6fab370ebd057b1643343a3f00ad9cbf02
     "models.data2vec": [
         "Data2VecAudioConfig",
         "Data2VecTextConfig",
