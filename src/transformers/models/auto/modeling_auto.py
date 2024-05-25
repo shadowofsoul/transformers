@@ -72,6 +72,7 @@ MODEL_MAPPING_NAMES = OrderedDict(
         ("cpmant", "CpmAntModel"),
         ("ctrl", "CTRLModel"),
         ("cvt", "CvtModel"),
+        ('dac', "DacModel"),
         ("data2vec-audio", "Data2VecAudioModel"),
         ("data2vec-text", "Data2VecTextModel"),
         ("data2vec-vision", "Data2VecVisionModel"),
@@ -176,6 +177,7 @@ MODEL_MAPPING_NAMES = OrderedDict(
         ("opt", "OPTModel"),
         ("owlv2", "Owlv2Model"),
         ("owlvit", "OwlViTModel"),
+        ("parler_tts","ParlerTTSModel"),
         ("patchtsmixer", "PatchTSMixerModel"),
         ("patchtst", "PatchTSTModel"),
         ("pegasus", "PegasusModel"),
@@ -478,6 +480,7 @@ MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = OrderedDict(
         ("open-llama", "OpenLlamaForCausalLM"),
         ("openai-gpt", "OpenAIGPTLMHeadModel"),
         ("opt", "OPTForCausalLM"),
+        ("parler_tts", "ParlerTTSForCausalLM"),
         ("pegasus", "PegasusForCausalLM"),
         ("persimmon", "PersimmonForCausalLM"),
         ("phi", "PhiForCausalLM"),
@@ -1221,6 +1224,7 @@ MODEL_FOR_TEXT_TO_WAVEFORM_MAPPING_NAMES = OrderedDict(
         ("musicgen_melody", "MusicgenMelodyForConditionalGeneration"),
         ("seamless_m4t", "SeamlessM4TForTextToSpeech"),
         ("seamless_m4t_v2", "SeamlessM4Tv2ForTextToSpeech"),
+        ("parler_tts", "ParlerTTSForConditionalGeneration"),
         ("vits", "VitsModel"),
     ]
 )

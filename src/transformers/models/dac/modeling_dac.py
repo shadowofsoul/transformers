@@ -98,7 +98,7 @@ class DacConv1d(nn.Module):
         # warn user on unusual setup between dilation and stride
         if stride > 1 and dilation > 1:
             logger.warning(
-                "EncodecConv1d has been initialized with stride > 1 and dilation > 1"
+                "DacConv1d has been initialized with stride > 1 and dilation > 1"
                 f" (kernel_size={kernel_size} stride={stride}, dilation={dilation})."
             )
 
@@ -245,7 +245,7 @@ class DacResnetBlock(nn.Module):
     Residual block from SEANet model as used by EnCodec.
     """
 
-    def __init__(self, config: EncodecConfig, dim: int, dilations: List[int]):
+    def __init__(self, config: DacConfig, dim: int, dilations: List[int]):
         super().__init__()
         kernel_sizes = (config.residual_kernel_size, 1)
         if len(kernel_sizes) != len(dilations):
@@ -257,11 +257,11 @@ class DacResnetBlock(nn.Module):
             in_chs = dim if i == 0 else hidden
             out_chs = dim if i == len(kernel_sizes) - 1 else hidden
             block += [nn.ELU()]
-            block += [EncodecConv1d(config, in_chs, out_chs, kernel_size, dilation=dilation)]
+            block += [DacConv1d(config, in_chs, out_chs, kernel_size, dilation=dilation)]
         self.block = nn.ModuleList(block)
 
         if config.use_conv_shortcut:
-            self.shortcut = EncodecConv1d(config, dim, dim, kernel_size=1)
+            self.shortcut = DacConv1d(config, dim, dim, kernel_size=1)
         else:
             self.shortcut = nn.Identity()
 

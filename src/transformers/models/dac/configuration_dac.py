@@ -104,10 +104,14 @@ class DacConfig(PretrainedConfig):
     >>> configuration = model.config
     ```"""
 
-    model_type = "encodec"
+    model_type = "dac"
 
     def __init__(
         self,
+        frame_rate=86,
+        latent_dim=1024,
+        model_bitrate=8,
+        num_codebooks=9,
         target_bandwidths=[1.5, 3.0, 6.0, 12.0, 24.0],
         sampling_rate=24_000,
         audio_channels=1,
@@ -129,10 +133,14 @@ class DacConfig(PretrainedConfig):
         num_lstm_layers=2,
         trim_right_ratio=1.0,
         codebook_size=1024,
-        codebook_dim=None,
+        codebook_dim=1024,
         use_conv_shortcut=True,
         **kwargs,
     ):
+        self.frame_rate = frame_rate
+        self.lantent_dim = latent_dim
+        self.model_bitrate = model_bitrate
+        self.num_codebooks = num_codebooks
         self.target_bandwidths = target_bandwidths
         self.sampling_rate = sampling_rate
         self.audio_channels = audio_channels
@@ -180,10 +188,10 @@ class DacConfig(PretrainedConfig):
         else:
             return max(1, int((1.0 - self.overlap) * self.chunk_length))
 
-    @property
-    def frame_rate(self) -> int:
-        hop_length = np.prod(self.upsampling_ratios)
-        return math.ceil(self.sampling_rate / hop_length)
+    #@property
+    #def frame_rate(self) -> int:
+    #    hop_length = np.prod(self.upsampling_ratios)
+    #    return math.ceil(self.sampling_rate / hop_length)
 
     @property
     def num_quantizers(self) -> int:
